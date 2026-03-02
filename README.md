@@ -48,6 +48,7 @@ intact while the last layer adapts to spam detection.
 Fewer trainable parameters means less chance of memorizing noise in small 
 datasets. We reduced trainable parameters from 124M to ~7M by freezing most 
 layers — enough capacity to learn spam patterns, not enough to overfit.
+
 ---
 
 ## Project Structure
