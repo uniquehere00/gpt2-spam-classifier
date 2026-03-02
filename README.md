@@ -36,22 +36,18 @@ Input Tokens
 
 ## Design Decisions
 
-**Why GPT-2 over classical models (SVM, Naive Bayes, LSTM)?**
+*Why selective fine-tuning?*
 
-Classical models treat text as bag-of-words or shallow sequences and lose contextual meaning. GPT-2's attention mechanism captures nuanced language patterns — phrasing, urgency, and stylistic cues — that are characteristic of spam but invisible to n-gram or frequency-based approaches. The goal was also to validate whether a general-purpose language model can be efficiently repurposed for a narrow classification task with minimal task-specific training.
+We only have ~1500 training samples. Training all 124M parameters on such a 
+small dataset would cause the model to memorize training data rather than 
+generalize. Freezing the first 11 layers keeps GPT-2's language understanding 
+intact while the last layer adapts to spam detection.
 
-**Why selective fine-tuning instead of full fine-tuning?**
+*Why does freezing layers prevent overfitting?*
 
-With only ~1500 training samples, full fine-tuning of 124M parameters would cause severe overfitting. By freezing the first 11 transformer blocks and training only the last block, final norm, and classification head (~7M parameters), the model retains general linguistic representations learned during pretraining while adapting top-level features to the classification objective. This is analogous to transfer learning in computer vision where early convolutional layers are frozen.
-
-**Why undersampling instead of class weighting?**
-
-The dataset has a 6.5:1 ham-to-spam imbalance. Class weighting keeps all samples but penalizes misclassification of the minority class. Undersampling was chosen because it produces a balanced training distribution, reducing the risk of the model developing a systematic ham bias during fine-tuning. Given the small dataset size, the loss of majority class samples was acceptable.
-
-**Why does freezing most layers prevent overfitting?**
-
-Each trainable parameter is an additional degree of freedom the optimizer can exploit to memorize training data. Freezing 11 of 12 transformer blocks reduces the effective parameter count from 124M to approximately 7M. This constrains the model's capacity to fit noise in the small training set while still allowing task-specific adaptation in the upper layers where high-level semantic features are encoded.
-
+Fewer trainable parameters means less chance of memorizing noise in small 
+datasets. We reduced trainable parameters from 124M to ~7M by freezing most 
+layers — enough capacity to learn spam patterns, not enough to overfit.
 ---
 
 ## Project Structure
