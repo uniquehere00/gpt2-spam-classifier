@@ -1,0 +1,15 @@
+# Model weights - too large for GitHub
+saved_model/*.pth
+
+# Downloaded OpenAI GPT-2 weights
+gpt2/
+
+# Python cache
+_pycache_/
+*.pyc
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Data zip files
+*.zip

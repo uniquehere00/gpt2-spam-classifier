@@ -1,0 +1,66 @@
+{
+    "experiment": "GPT-2 Fine-tuning for Spam Classification",
+    "author": "your name here",
+
+    "model": {
+        "architecture": "GPT-2 Transformer",
+        "parameters": "124M",
+        "pretrained_weights": "OpenAI GPT-2 (124M)",
+        "vocab_size": 50257,
+        "context_length": 1024,
+        "embedding_dim": 768,
+        "attention_heads": 12,
+        "transformer_layers": 12
+    },
+
+    "dataset": {
+        "name": "SMS Spam Collection",
+        "source": "UCI Machine Learning Repository",
+        "total_samples": 1494,
+        "split": {
+            "train": 1045,
+            "validation": 149,
+            "test": 300
+        },
+        "balancing_strategy": "Undersampling majority class (ham) to match spam count",
+        "classes": ["ham (not spam)", "spam"]
+    },
+
+    "fine_tuning_strategy": {
+        "approach": "Selective layer fine-tuning",
+        "frozen": "First 11 transformer blocks",
+        "trainable": [
+            "Last transformer block (block 12)",
+            "Final layer normalization",
+            "Adding Classification head (2 output classes)"
+        ],
+        "reason": "Preserves pretrained language knowledge while adapting to classification task"
+    },
+
+    "training": {
+        "optimizer": "AdamW",
+        "learning_rate": 0.00002,
+        "weight_decay": 0.1,
+        "epochs": 5,
+        "batch_size": 8,
+        "eval_freq": 50,
+        "hardware": "Kaggle T4 x2 GPU",
+        "training_time_minutes": 1.09,
+        "cpu_training_time_minutes": 40.0
+    },
+
+    "results": {
+        "cpu_baseline_accuracy": 83.76,
+        "gpu_test_accuracy": 94.67,
+        "improvement_percent": 10.91,
+        "validation_accuracy_epoch_1": 95.00,
+        "validation_accuracy_final": 95.00
+    },
+
+    "key_findings": [
+        "GPU training was 37x faster than CPU (1.09 min vs 40 min)",
+        "Fine-tuning only 1 of 12 transformer blocks achieved 94.67% accuracy",
+        "OpenAI pretrained weights significantly boosted classification performance",
+        "Model generalizes well with validation accuracy matching test accuracy"
+    ]
+}
