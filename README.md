@@ -30,20 +30,20 @@ Input Tokens
         └── Classification Head (768 → 2)
 ```
 
-**Fine-tuning strategy:** All 12 transformer blocks are frozen. Only the last transformer block, final layer norm, and classification head are trained. This preserves pretrained language representations while adapting the model to the classification task.
+**Fine-tuning strategy:** The first 11 transformer blocks are frozen. Only the last transformer block, final layer norm, and classification head are trained. This preserves pretrained language representations while adapting the model to the classification task.
 
 ---
 
 ## Design Decisions
 
-*Why selective fine-tuning?*
+**Why selective fine-tuning?**
 
 We only have ~1500 training samples. Training all 124M parameters on such a 
 small dataset would cause the model to memorize training data rather than 
 generalize. Freezing the first 11 layers keeps GPT-2's language understanding 
 intact while the last layer adapts to spam detection.
 
-*Why does freezing layers prevent overfitting?*
+**Why does freezing layers prevent overfitting?**
 
 Fewer trainable parameters means less chance of memorizing noise in small 
 datasets. We reduced trainable parameters from 124M to ~7M by freezing most 
@@ -142,12 +142,14 @@ SMS Spam Collection from the UCI ML Repository. The dataset is class-imbalanced 
 
 ## Key Implementation Details
 
-- **No HuggingFace** — GPT-2 architecture built entirely from scratch in PyTorch including multi-head causal self-attention, layer normalization, GELU activation,positional embeddings and token embeddings. 
-- **Causal masking** — upper-triangular mask implemented inside `MultiHeadAttention`so that the tokens could not pay attention to the future tokens,which will lead to cheating .
+- **No HuggingFace** — GPT-2 architecture built entirely from scratch in PyTorch including multi-head causal self-attention, layer normalization, GELU activation, positional embeddings and token embeddings. 
+- **Causal masking** — upper-triangular mask implemented inside `MultiHeadAttention` preventing attention to future tokens
 - **Selective fine-tuning** — only ~7M of 124M parameters trained, achieving 10.9% accuracy improvement over CPU baseline
 - **Single entry point** — `main.py` runs the full pipeline from weight download to model evaluation in one command
 - **Clean inference API** — `inference.py` exposes `load_model` and `classify_review` decoupled from training code, ready for deployment
 - **Reproducibility** — random seeds fixed at 123 across PyTorch and dataset shuffling
+- **Manual weight porting** — OpenAI TensorFlow checkpoint parameters mapped 
+manually to PyTorch including transposing fused QKV projection matrices
 
 ---
 
