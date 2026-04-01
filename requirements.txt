@@ -1,8 +1,6 @@
+streamlit
 torch
 tiktoken 
 pandas
 numpy
-openpyxl
-tensorflow
-requests
-tqdm
+huggingface_hub
