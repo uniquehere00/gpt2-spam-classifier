@@ -20,7 +20,8 @@ st.set_page_config(
 def get_model():
     weights_path = hf_hub_download(
         repo_id="uniquehere00/gpt2-spam-classifier",
-        filename="spam_classifier_gpu.pth"
+        filename="spam_classifier_gpu.pth",
+        repo_type="model"
     )
     device = torch.device("cpu")
     model = load_model(
